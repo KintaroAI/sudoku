@@ -67,7 +67,8 @@
         subCols = 2,
         cellSize = 100,
         gap = 8,
-        margin = 15
+        margin = 15,
+        hintShake = true
       } = {}) {
         const N = subRows * subCols; // board dimension (e.g., 4, 9, 16...)
         const boardPx = margin*2 + N*cellSize + (N-1)*gap;
@@ -182,6 +183,26 @@
                 t.setAttribute("y", cy);
                 t.setAttribute("class", `hint-${d}`);
                 t.textContent = d.toString();
+                
+                // Add random shake animation (if enabled)
+                if (hintShake) {
+                  const shakeAmount = 0.5; // pixels
+                  const shakeSpeed = 0.8 + Math.random() * 0.4; // 0.8-1.2 seconds
+                  const shakeDelay = Math.random() * 2; // 0-2 seconds delay
+                  
+                  const animateShake = () => {
+                    const offsetX = (Math.random() - 0.5) * shakeAmount * 2;
+                    const offsetY = (Math.random() - 0.5) * shakeAmount * 2;
+                    t.setAttribute("x", cx + offsetX);
+                    t.setAttribute("y", cy + offsetY);
+                  };
+                  
+                  // Start shaking after delay
+                  setTimeout(() => {
+                    setInterval(animateShake, 1000 / (60 * shakeSpeed)); // 60fps * speed
+                  }, shakeDelay * 1000);
+                }
+                
                 g.appendChild(t);
               }
             }
@@ -257,7 +278,8 @@
         subCols: 2,
         cellSize: 110,
         gap: 32,
-        margin: 36
+        margin: 36,
+        hintShake: true  // Set to false to disable hint shaking
       });
 
       // Example: programmatically toggle selection / hints (you can test in DevTools)
