@@ -96,7 +96,9 @@
     }
     endpoints(){
       const sb=this.d.blocks[this.start.block], eb=this.d.blocks[this.end.block];
-      const p0=sb.anchor(this.start.edge,this.start.t), d0=sb.edgeDir(this.start.edge);
+      let p0=sb.anchor(this.start.edge,this.start.t), d0=sb.edgeDir(this.start.edge);
+      const dOutStart=sb.edgeDir(this.start.edge);
+      p0={x:p0.x + dOutStart.x*this.outOffset, y:p0.y + dOutStart.y*this.outOffset}; // push outside start block
       let p3=eb.anchor(this.end.edge,this.end.t);
       const dOut=eb.edgeDir(this.end.edge), dInto=eb.edgeDirInto(this.end.edge);
       p3={x:p3.x + dOut.x*this.outOffset, y:p3.y + dOut.y*this.outOffset}; // push outside target block
