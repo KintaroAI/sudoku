@@ -1,0 +1,40 @@
+/* ======== Blocks Library CSS ======== */
+
+:root {
+  --bg: #161a1e; 
+  --grid: #24282d; 
+  --block-fill: #2b3036; 
+  --block-border: #5a646e; 
+  --text: #ebf0f5;
+}
+
+/* Basic block styling (applies inside each instance) */
+.block rect { 
+  fill: var(--block-fill); 
+  stroke: var(--block-border); 
+  stroke-width: 2; 
+  rx: 14; 
+  ry: 14; 
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.3)); 
+  cursor: grab; 
+}
+
+.block.dragging rect { 
+  cursor: grabbing; 
+}
+
+.block text { 
+  fill: var(--text); 
+  font-size: 16px; 
+  font-weight: 500; 
+}
+
+/* Optional: styling tweak for notes */
+.block.note rect { 
+  opacity: .35; 
+}
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+.canvas { background: #111519; border: 1px solid #293039; border-radius: 14px; overflow: hidden; }
+
+.dash { stroke-dasharray: 8 6; }
