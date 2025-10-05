@@ -96,7 +96,10 @@
               blk._hintsEl = gHints;
 
               // API method: update hints (Set<number> or array)
-              blk.setHints = (vals) => renderHints(blk, vals);
+              blk.setHints = (vals) => {
+                blk._currentHints = vals; // Store current hints for re-rendering
+                renderHints(blk, vals);
+              };
             }
           }
 
@@ -173,7 +176,6 @@
               const cc = idx % 3;
               const cx = blk.x + pad + cc*cellW + cellW/2;
               const cy = blk.y + pad + rr*cellH + cellH/2;
-
               if (set.has(d)) {
                 const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 t.setAttribute("x", cx);
@@ -192,7 +194,7 @@
           // (You can replace these with your own later)
           const demo = [
             { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9] },
-            { at: "R2C3", hints: [2,5,6,9] },
+            { at: "R1C2", hints: [2,5,6,9] },
             { at: "R3C2", hints: [7,8]   },
             { at: "R4C4", hints: [1,2,3,4,5,6,7,8,9] }
           ]; // Show hints for all grid sizes

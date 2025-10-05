@@ -50,6 +50,13 @@
       const cx=this.x+this.w/2, y0=(this.y+this.h/2)-(totalH/2)+12;
       this.text.setAttribute("x",cx); this.text.setAttribute("y",y0);
       for(const t of this.text.querySelectorAll("tspan")) t.setAttribute("x",cx);
+      
+      // Update hint positions when block moves
+      if (this._hintsEl && this.setHints) {
+        // Re-render hints with new position
+        const currentHints = this._currentHints || [];
+        this.setHints(currentHints);
+      }
     }
     _bindDrag(){
       let start=null;
