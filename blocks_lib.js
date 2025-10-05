@@ -78,11 +78,13 @@
     }
   }
   class Connection {
-    constructor(diagram, {start,end,color,className,width=3,sparks=0,sparkSpeed=0.8,emitter=false,maxLive=0,emitMult=1.0,outOffset=4}){
+    constructor(diagram, {start,end,color,className,width=3,sparks=0,sparkSpeed=0.8,emitter=false,maxLive=0,emitMult=1.0,outOffset=4,arrow=true}){
       this.d=diagram; this.start=start; this.end=end; this.width=width; this.color=color; this.className=className;
       this.sparks=Math.max(0,sparks); this.sparkSpeed=Math.max(0,sparkSpeed); this.emitter=!!emitter; this.maxLive=maxLive|0; this.emitMult=Math.max(0,emitMult); this.outOffset=outOffset;
       this.live=[]; this.emitAcc=0;
-      this.path = create("path", {fill:"none","stroke-width":width,"marker-end":`url(#${this.d.ids.arrow})`}, this.d.gConns);
+      const pathAttrs = { fill:"none", "stroke-width":width };
+      if (arrow !== false) pathAttrs["marker-end"] = `url(#${this.d.ids.arrow})`;
+      this.path = create("path", pathAttrs, this.d.gConns);
       // allow either CSS class or color (color may be a palette key)
       if(this.className) this.path.setAttribute("class",this.className);
       if(this.color) {

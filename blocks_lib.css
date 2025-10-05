@@ -38,3 +38,10 @@
 .canvas { background: #111519; border: 1px solid #293039; border-radius: 14px; overflow: hidden; }
 
 .dash { stroke-dasharray: 8 6; }
+
+/* Thin, arrowless neighbor connectors */
+.neighbor {
+  stroke: var(--block-border);
+  stroke-width: 1.5;
+  opacity: .6;
+}

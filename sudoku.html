@@ -100,6 +100,43 @@
             }
           }
 
+          // --- NEW: connect nearest neighbors with thin arrowless lines ---
+          const connectNeighbors = () => {
+            const edgeT = 0; // center of the edge
+            for (let r = 0; r < N; r++) {
+              for (let c = 0; c < N; c++) {
+                const id = `R${r+1}C${c+1}`;
+                // Right neighbor
+                if (c+1 < N) {
+                  const idR = `R${r+1}C${c+2}`;
+                  b.connect({
+                    start: { block: id,  edge: "right",  t: edgeT },
+                    end:   { block: idR, edge: "left",   t: edgeT },
+                    className: "neighbor",
+                    width: 1.5,
+                    arrow: false,       // <-- no arrowhead
+                    sparks: 0,
+                    outOffset: 1.5
+                  });
+                }
+                // Bottom neighbor
+                if (r+1 < N) {
+                  const idB = `R${r+2}C${c+1}`;
+                  b.connect({
+                    start: { block: id,  edge: "bottom", t: edgeT },
+                    end:   { block: idB, edge: "top",    t: edgeT },
+                    className: "neighbor",
+                    width: 1.5,
+                    arrow: false,       // <-- no arrowhead
+                    sparks: 0,
+                    outOffset: 1.5
+                  });
+                }
+              }
+            }
+          };
+          connectNeighbors();
+
           // Canvas click clears selection
           b.svg.addEventListener("click", () => setActive(null));
 
@@ -154,7 +191,7 @@
           // Demo: seed a few hints so you can see the feature
           // (You can replace these with your own later)
           const demo = [
-            { at: "R1C1", hints: [1,3,4] },
+            { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9] },
             { at: "R2C3", hints: [2,5,6,9] },
             { at: "R3C2", hints: [7,8]   },
             { at: "R4C4", hints: [1,2,3,4,5,6,7,8,9] }
@@ -214,7 +251,7 @@
 
       // --- Kickoff: 2x2 subgrid (4x4 board) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 2,
+        subRows: 1,
         subCols: 2,
         cellSize: 110,
         gap: 32,
