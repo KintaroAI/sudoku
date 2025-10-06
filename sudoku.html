@@ -28,22 +28,22 @@
     pointer-events: none;
   }
   /* Per-digit hint colors (tweak to taste) */
-  .sudoku-hints .hint-1 { fill: #F44336; } /* red */
-  .sudoku-hints .hint-2 { fill: #E91E63; } /* pink */
-  .sudoku-hints .hint-3 { fill: #9C27B0; } /* purple */
-  .sudoku-hints .hint-4 { fill: #3F51B5; } /* indigo */
-  .sudoku-hints .hint-5 { fill: #2196F3; } /* blue */
-  .sudoku-hints .hint-6 { fill: #009688; } /* teal */
-  .sudoku-hints .hint-7 { fill: #4CAF50; } /* green */
-  .sudoku-hints .hint-8 { fill: #FFC107; } /* amber */
-  .sudoku-hints .hint-9 { fill: #FF9800; } /* orange */
+  .sudoku-hint-1 { fill: #F44336; } /* red */
+  .sudoku-hint-2 { fill: #E91E63; } /* pink */
+  .sudoku-hint-3 { fill: #9C27B0; } /* purple */
+  .sudoku-hint-4 { fill: #3F51B5; } /* indigo */
+  .sudoku-hint-5 { fill: #2196F3; } /* blue */
+  .sudoku-hint-6 { fill: #009688; } /* teal */
+  .sudoku-hint-7 { fill: #4CAF50; } /* green */
+  .sudoku-hint-8 { fill: #FFC107; } /* amber */
+  .sudoku-hint-9 { fill: #FF9800; } /* orange */
 
   /* Thicker subgrid guides (drawn as note blocks so they sit on top) */
   .subgrid-line { fill:none; stroke:#5a646e; stroke-width:3.5; opacity:.9; }
 
   /* Big number in a cell */
   .sudoku-value {
-    font-size: 44px !important;
+    font-size: 44px;
     font-weight: 800;
     text-anchor: middle;
     dominant-baseline: middle;
@@ -115,7 +115,6 @@
 
               // Big centered value text
               const gVal = document.createElementNS(SVG_NS, "text");
-              gVal.setAttribute("class", "sudoku-value");
               gVal.setAttribute("x", blk.x + blk.w/2);
               gVal.setAttribute("y", blk.y + blk.h/2);
               gVal.style.display = "none";          // hidden until a value is set
@@ -141,6 +140,10 @@
                   blk._value = n;
                   blk._valueEl.textContent = String(n);
                   blk._valueEl.style.display = "";
+                  
+                  // Add hint color class based on number
+                  blk._valueEl.setAttribute("class", `sudoku-value sudoku-hint-${n}`);
+                  
                   // Hide hints when value is present
                   blk._hintsEl.style.display = "none";
                   // Re-center (defensive)
@@ -248,7 +251,7 @@
                 const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 t.setAttribute("x", cx);
                 t.setAttribute("y", cy);
-                t.setAttribute("class", `hint-${d}`);
+                t.setAttribute("class", `sudoku-hint-${d}`);
                 t.textContent = d.toString();
                 
                 // Add random shake animation (if enabled)
