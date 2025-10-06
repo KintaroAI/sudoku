@@ -100,6 +100,7 @@
        *   margin: outer margin inside canvas (px)
        *   singleSection: if true, render only subRows x subCols cells instead of NxN board
        *   maxHint: maximum hint number (if null, defaults to subRows * subCols)
+       *   autosolver: if true, automatically set cell values when only one hint remains
        */
       function initSudoku(container, {
         subRows = 2,
@@ -110,7 +111,8 @@
         hintShake = true,
         correctValues = {},
         singleSection = false,
-        maxHint = null
+        maxHint = null,
+        autosolver = false
       } = {}) {
         const N = subRows * subCols; // classic board size
         const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -518,6 +520,11 @@
                 if (blk && blk._value === null) { // Only update hints for empty cells
                   const validHints = getValidHints(r, c);
                   blk.setHints(validHints);
+                  
+                  // Autosolver: if enabled and only one hint remains, set the value
+                  if (autosolver && validHints.length === 1) {
+                    blk.setValue(validHints[0]);
+                  }
                 }
               }
             }
@@ -579,12 +586,13 @@
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
         subRows: 2,
-        subCols: 3,
-        singleSection: false,   // <-- enable special case
+        subCols: 2,
+        singleSection: true,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
+        autosolver: false, // Enable autosolver - automatically set values when only one hint remains
         //maxHint: 2,
         correctValues: {
           "R1C1": 1,
