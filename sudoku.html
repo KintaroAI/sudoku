@@ -261,8 +261,57 @@
             }
           }
 
-          // Add a global key handler for digit input and clearing
+          // Add a global key handler for digit input, clearing, and navigation
           document.addEventListener("keydown", (e) => {
+            // ESC key to clear selection
+            if (e.key === "Escape") {
+              setActive(null);
+              e.preventDefault();
+              return;
+            }
+
+            // Arrow key navigation
+            if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
+              e.preventDefault();
+              
+              // If no block is selected, select R1C1 (top-left)
+              if (!activeId) {
+                setActive("R1C1");
+                return;
+              }
+
+              // Parse current position
+              const currentMatch = activeId.match(/R(\d+)C(\d+)/);
+              if (!currentMatch) return;
+              
+              let currentRow = parseInt(currentMatch[1], 10);
+              let currentCol = parseInt(currentMatch[2], 10);
+
+              // Calculate new position based on arrow direction
+              switch (e.key) {
+                case "ArrowUp":
+                  currentRow = Math.max(1, currentRow - 1);
+                  break;
+                case "ArrowDown":
+                  currentRow = Math.min(ROWS, currentRow + 1);
+                  break;
+                case "ArrowLeft":
+                  currentCol = Math.max(1, currentCol - 1);
+                  break;
+                case "ArrowRight":
+                  currentCol = Math.min(COLS, currentCol + 1);
+                  break;
+              }
+
+              // Select the new block
+              const newId = `R${currentRow}C${currentCol}`;
+              if (b.block(newId)) {
+                setActive(newId);
+              }
+              return;
+            }
+
+            // Only process digit and delete keys if a block is selected
             if (!activeId) return;
             const blk = b.block(activeId);
             if (!blk) return;
