@@ -133,6 +133,7 @@
               gHints.setAttribute("class", "sudoku-hints");
               blk.g.appendChild(gHints);
               blk._hintsEl = gHints;
+              blk._hintIntervals = []; // Store interval IDs for cleanup
 
               // API method: update hints (Set<number> or array)
               blk.setHints = (vals) => {
@@ -173,6 +174,12 @@
                   
                   // Add hint color class based on number
                   blk._valueEl.setAttribute("class", `sudoku-value sudoku-hint-${n}`);
+                  
+                  // Clear hint intervals when value is set
+                  if (blk._hintIntervals) {
+                    blk._hintIntervals.forEach(intervalId => clearInterval(intervalId));
+                    blk._hintIntervals = [];
+                  }
                   
                   // Hide hints when value is present
                   blk._hintsEl.style.display = "none";
@@ -265,6 +272,9 @@
             // Delete / Backspace to clear
             if (e.key === "Backspace" || e.key === "Delete") {
               blk.setValue(null);
+              // Re-render hints with new position
+              const currentHints = blk._currentHints || [];
+              blk.setHints(currentHints);
               e.preventDefault();
             }
           });
@@ -273,6 +283,13 @@
           function renderHints(blk, values) {
             const set = new Set(values || []);
             const g = blk._hintsEl;
+            
+            // Clear any existing intervals to prevent memory leaks
+            if (blk._hintIntervals) {
+              blk._hintIntervals.forEach(intervalId => clearInterval(intervalId));
+              blk._hintIntervals = [];
+            }
+            
             g.replaceChildren();
 
             // Cell inner box
@@ -312,7 +329,8 @@
                   
                   // Start shaking after delay
                   setTimeout(() => {
-                    setInterval(animateShake, 1000 / (60 * shakeSpeed)); // 60fps * speed
+                    const intervalId = setInterval(animateShake, 1000 / (60 * shakeSpeed)); // 60fps * speed
+                    blk._hintIntervals.push(intervalId); // Store interval ID for cleanup
                   }, shakeDelay * 1000);
                 }
                 
