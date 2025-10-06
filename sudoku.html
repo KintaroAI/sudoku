@@ -18,6 +18,32 @@
     filter: drop-shadow(0 0 6px rgba(139,209,255,.45));
   }
 
+
+  .block.correct rect {
+    stroke: #4CAF50;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 1px rgba(76,175,80,.6));
+  }
+
+  .block.incorrect rect {
+    stroke: #F44336;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 1px rgba(244,67,54,.6));
+  }
+
+  /* Validation feedback borders */
+  .block.active.correct rect {
+    stroke: #4CAF50;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 8px rgba(76,175,80,.6));
+  }
+
+  .block.active.incorrect rect {
+    stroke: #F44336;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 8px rgba(244,67,54,.6));
+  }
+
   /* Hints (3x3 pencil marks) */
   .sudoku-hints text {
     font-size: 23px;
@@ -79,7 +105,8 @@
         cellSize = 100,
         gap = 8,
         margin = 15,
-        hintShake = true
+        hintShake = true,
+        correctValues = {}
       } = {}) {
         const N = subRows * subCols; // board dimension (e.g., 4, 9, 16...)
         const boardPx = margin*2 + N*cellSize + (N-1)*gap;
@@ -121,6 +148,7 @@
               blk.g.appendChild(gVal);
               blk._valueEl = gVal;
               blk._value = null;
+              blk._correctValue = correctValues[blk.id] || null;
 
               // API method: set / clear the big value (number 1..9 or null)
               blk.setValue = (v) => {
@@ -130,6 +158,8 @@
                   blk._valueEl.style.display = "none";
                   // Show hints back
                   blk._hintsEl.style.display = "";
+                  // Clear validation classes
+                  blk.g.classList.remove("correct", "incorrect");
                   // Re-center value in case of future resize/move
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
@@ -146,6 +176,19 @@
                   
                   // Hide hints when value is present
                   blk._hintsEl.style.display = "none";
+                  
+                  // Validation feedback
+                  if (blk._correctValue !== null) {
+                    // Clear previous validation classes
+                    blk.g.classList.remove("correct", "incorrect");
+                    // Add appropriate validation class
+                    if (n === blk._correctValue) {
+                      blk.g.classList.add("correct");
+                    } else {
+                      blk.g.classList.add("incorrect");
+                    }
+                  }
+                  
                   // Re-center (defensive)
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
@@ -354,7 +397,12 @@
         cellSize: 110,
         gap: 32,
         margin: 36,
-        hintShake: true  // Set to false to disable hint shaking
+        hintShake: true,  // Set to false to disable hint shaking
+        correctValues: {
+          "R1C1": 3,  // Correct value for R1C1
+          "R1C2": 7,  // Correct value for R1C2
+          // Add more correct values as needed
+        }
       });
 
       // Example: programmatically toggle selection / hints (you can test in DevTools)
