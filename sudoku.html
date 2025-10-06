@@ -284,7 +284,28 @@
             }
           });
 
-          // Render hints: draw a 3x3 grid of tiny digits (1..maxHint) colored per number.
+          // Calculate optimal grid dimensions for hints
+          function calculateGridDimensions(hintCount) {
+            if (hintCount <= 0) return { rows: 0, cols: 0 };
+            if (hintCount === 1) return { rows: 1, cols: 1 };
+            if (hintCount <= 4) return { rows: 2, cols: 2 };
+            if (hintCount <= 6) return { rows: 2, cols: 3 };
+            if (hintCount <= 9) return { rows: 3, cols: 3 };
+            if (hintCount <= 12) return { rows: 3, cols: 4 };
+            if (hintCount <= 16) return { rows: 4, cols: 4 };
+            if (hintCount <= 20) return { rows: 4, cols: 5 };
+            if (hintCount <= 25) return { rows: 5, cols: 5 };
+            if (hintCount <= 30) return { rows: 5, cols: 6 };
+            if (hintCount <= 36) return { rows: 6, cols: 6 };
+            
+            // For very large numbers, use a more compact grid
+            const sqrt = Math.sqrt(hintCount);
+            const rows = Math.ceil(sqrt);
+            const cols = Math.ceil(hintCount / rows);
+            return { rows, cols };
+          }
+
+          // Render hints: draw a flexible grid of tiny digits based on hint count
           function renderHints(blk, values) {
             const set = new Set(values || []);
             const g = blk._hintsEl;
@@ -303,51 +324,62 @@
             // Filter out hints that exceed the maximum
             const filteredValues = Array.from(set).filter(val => val >= 1 && val <= maxHint);
             const filteredSet = new Set(filteredValues);
+            
+            if (filteredSet.size === 0) {
+              if (blk._value != null) {
+                blk._hintsEl.style.display = "none";
+              }
+              return;
+            }
+
+            // Calculate optimal grid dimensions based on the maximum hint number
+            const maxHintNum = Math.max(...filteredSet);
+            const { rows, cols } = calculateGridDimensions(maxHintNum);
 
             // Cell inner box
             const pad = 10; // inner padding
             const w = blk.w - pad*2;
             const h = blk.h - pad*2;
 
-            const cellW = w / 3;
-            const cellH = h / 3;
+            const cellW = w / cols;
+            const cellH = h / rows;
 
-            // Positions for digits 1..maxHint in row-major 3x3
-            for (let d = 1; d <= maxHint; d++) {
-              const idx = d - 1;
-              const rr = Math.floor(idx / 3);
-              const cc = idx % 3;
-              const cx = blk.x + pad + cc*cellW + cellW/2;
-              const cy = blk.y + pad + rr*cellH + cellH/2;
-              if (filteredSet.has(d)) {
-                const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                t.setAttribute("x", cx);
-                t.setAttribute("y", cy);
-                t.setAttribute("class", `sudoku-hint-${d}`);
-                t.textContent = d.toString();
+            // Position hints based on their actual numbers (1-based indexing)
+            for (const hintNum of filteredSet) {
+              // Convert 1-based hint number to 0-based grid position
+              const gridIndex = hintNum - 1;
+              const row = Math.floor(gridIndex / cols);
+              const col = gridIndex % cols;
+              const cx = blk.x + pad + col*cellW + cellW/2;
+              const cy = blk.y + pad + row*cellH + cellH/2;
+              
+              const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              t.setAttribute("x", cx);
+              t.setAttribute("y", cy);
+              t.setAttribute("class", `sudoku-hint-${hintNum}`);
+              t.textContent = hintNum.toString();
+              
+              // Add random shake animation (if enabled)
+              if (hintShake) {
+                const shakeAmount = 0.5; // pixels
+                const shakeSpeed = 0.8 + Math.random() * 0.4; // 0.8-1.2 seconds
+                const shakeDelay = Math.random() * 2; // 0-2 seconds delay
                 
-                // Add random shake animation (if enabled)
-                if (hintShake) {
-                  const shakeAmount = 0.5; // pixels
-                  const shakeSpeed = 0.8 + Math.random() * 0.4; // 0.8-1.2 seconds
-                  const shakeDelay = Math.random() * 2; // 0-2 seconds delay
-                  
-                  const animateShake = () => {
-                    const offsetX = (Math.random() - 0.5) * shakeAmount * 2;
-                    const offsetY = (Math.random() - 0.5) * shakeAmount * 2;
-                    t.setAttribute("x", cx + offsetX);
-                    t.setAttribute("y", cy + offsetY);
-                  };
-                  
-                  // Start shaking after delay
-                  setTimeout(() => {
-                    const intervalId = setInterval(animateShake, 1000 / (60 * shakeSpeed)); // 60fps * speed
-                    blk._hintIntervals.push(intervalId); // Store interval ID for cleanup
-                  }, shakeDelay * 1000);
-                }
+                const animateShake = () => {
+                  const offsetX = (Math.random() - 0.5) * shakeAmount * 2;
+                  const offsetY = (Math.random() - 0.5) * shakeAmount * 2;
+                  t.setAttribute("x", cx + offsetX);
+                  t.setAttribute("y", cy + offsetY);
+                };
                 
-                g.appendChild(t);
+                // Start shaking after delay
+                setTimeout(() => {
+                  const intervalId = setInterval(animateShake, 1000 / (60 * shakeSpeed)); // 60fps * speed
+                  blk._hintIntervals.push(intervalId); // Store interval ID for cleanup
+                }, shakeDelay * 1000);
               }
+              
+              g.appendChild(t);
             }
             
             // After you finish populating hints:
@@ -361,13 +393,19 @@
             drawSubgridGuides(b, { N, subRows, subCols, margin, cellSize, gap });
           }
 
-          // Demo: seed a few hints so you can see the feature
+          // Demo: seed a few hints so you can see the flexible grid feature
           // (You can replace these with your own later)
           const demo = [
-            { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] }, // Should only show 1,2,3
-            { at: "R1C2", hints: [2,5,6,9] }, // Should only show 2
-            { at: "R1C3", hints: [1,2,3,7,8,9,10,11,12,13,14,15,16] } // Should only show 1,2,3
-          ]; // Show hints for all grid sizes
+            { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] }, // Should only show 1,2 (2x1 grid)
+            { at: "R1C2", hints: [2,5,6,9] }, // Should only show 2 (3x3 grid with gaps)
+            { at: "R1C3", hints: [1,2,3,7,8,9,10,11,12,13,14,15,16] }, // Should only show 1,2 (2x1 grid)
+            { at: "R2C1", hints: [1,2,3,4] }, // 2x2 grid
+            { at: "R2C2", hints: [1,2,3,4,5,6] }, // 2x3 grid
+            { at: "R2C3", hints: [1,2,3,4,5,6,7,8,9] }, // 3x3 grid
+            { at: "R3C1", hints: [2,4,6,8] }, // 2x4 grid with gaps
+            { at: "R3C2", hints: [1,3,5,7,9] }, // 3x3 grid with gaps
+            { at: "R3C3", hints: [1] } // 1x1 grid
+          ]; // Show hints for various grid sizes with gaps
           for (const {at, hints} of demo) {
             const blk = b.block(at);
             if (blk) blk.setHints(hints);
@@ -424,7 +462,7 @@
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
         subRows: 2,
-        subCols: 1,
+        subCols: 3,
         singleSection: false,   // <-- enable special case
         cellSize: 110,
         gap: 32,
