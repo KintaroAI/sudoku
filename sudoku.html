@@ -288,6 +288,7 @@
           function calculateGridDimensions(hintCount) {
             if (hintCount <= 0) return { rows: 0, cols: 0 };
             if (hintCount === 1) return { rows: 1, cols: 1 };
+            if (hintCount <= 2) return { rows: 1, cols: 2 };
             if (hintCount <= 4) return { rows: 2, cols: 2 };
             if (hintCount <= 6) return { rows: 2, cols: 3 };
             if (hintCount <= 9) return { rows: 3, cols: 3 };
@@ -333,8 +334,7 @@
             }
 
             // Calculate optimal grid dimensions based on the maximum hint number
-            const maxHintNum = Math.max(...filteredSet);
-            const { rows, cols } = calculateGridDimensions(maxHintNum);
+            const { rows, cols } = calculateGridDimensions(maxHint);
 
             // Cell inner box
             const pad = 10; // inner padding
@@ -461,7 +461,7 @@
 
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 2,
+        subRows: 3,
         subCols: 3,
         singleSection: false,   // <-- enable special case
         cellSize: 110,
