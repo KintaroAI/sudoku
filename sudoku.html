@@ -98,6 +98,7 @@
        *   cellSize: block width/height (px)
        *   gap: spacing between cells (px)
        *   margin: outer margin inside canvas (px)
+       *   singleSection: if true, render only subRows x subCols cells instead of NxN board
        */
       function initSudoku(container, {
         subRows = 2,
@@ -106,16 +107,20 @@
         gap = 8,
         margin = 15,
         hintShake = true,
-        correctValues = {}
+        correctValues = {},
+        singleSection = false
       } = {}) {
-        const N = subRows * subCols; // board dimension (e.g., 4, 9, 16...)
-        const boardPx = margin*2 + N*cellSize + (N-1)*gap;
+        const N = subRows * subCols; // classic board size
+        const ROWS = singleSection ? subRows : N;    // <-- NEW
+        const COLS = singleSection ? subCols : N;    // <-- NEW
+        const boardPx = margin*2 + COLS*cellSize + (COLS-1)*gap; // width
+        const boardPy = margin*2 + ROWS*cellSize + (ROWS-1)*gap; // height
 
         const api = run_blocks(container, (b) => {
-          // Helper: lay out NxN cells as blocks
+          // Helper: lay out ROWSxCOLS cells as blocks
           const blocks = [];
-          for (let r = 0; r < N; r++) {
-            for (let c = 0; c < N; c++) {
+          for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
               const id = `R${r+1}C${c+1}`;
               const x = margin + c*(cellSize + gap);
               const y = margin + r*(cellSize + gap);
@@ -207,11 +212,11 @@
           // --- NEW: connect nearest neighbors with thin arrowless lines ---
           const connectNeighbors = () => {
             const edgeT = 0; // center of the edge
-            for (let r = 0; r < N; r++) {
-              for (let c = 0; c < N; c++) {
+            for (let r = 0; r < ROWS; r++) {
+              for (let c = 0; c < COLS; c++) {
                 const id = `R${r+1}C${c+1}`;
                 // Right neighbor
-                if (c+1 < N) {
+                if (c+1 < COLS) {
                   const idR = `R${r+1}C${c+2}`;
                   b.connect({
                     start: { block: id,  edge: "right",  t: edgeT },
@@ -224,7 +229,7 @@
                   });
                 }
                 // Bottom neighbor
-                if (r+1 < N) {
+                if (r+1 < ROWS) {
                   const idB = `R${r+2}C${c+1}`;
                   b.connect({
                     start: { block: id,  edge: "bottom", t: edgeT },
@@ -345,7 +350,9 @@
           }
 
           // Subgrid guide lines (as "notes" so they sit topmost)
-          drawSubgridGuides(b, { N, subRows, subCols, margin, cellSize, gap });
+          if (!singleSection) {
+            drawSubgridGuides(b, { N, subRows, subCols, margin, cellSize, gap });
+          }
 
           // Demo: seed a few hints so you can see the feature
           // (You can replace these with your own later)
@@ -365,11 +372,11 @@
             setActive,
             setHints(id, arr) { const blk = b.block(id); if (blk) blk.setHints(arr); },
             clearHints(id) { const blk = b.block(id); if (blk) blk.setHints([]); },
-            size: N
+            size: { rows: ROWS, cols: COLS }
           };
         }, {
           width: boardPx,
-          height: boardPx,
+          height: boardPy,
           grid: true,
           debug: false
         });
@@ -408,17 +415,18 @@
         }
       }
 
-      // --- Kickoff: 2x2 subgrid (4x4 board) as requested ---
+      // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
         subRows: 1,
-        subCols: 2,
+        subCols: 3,
+        singleSection: true,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
         correctValues: {
-          "R1C1": 3,  // Correct value for R1C1
-          "R1C2": 7,  // Correct value for R1C2
+          "R1C1": 1,
+          "R1C2": 2,
           // Add more correct values as needed
         }
       });
