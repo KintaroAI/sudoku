@@ -34,7 +34,7 @@
   opacity: .35; 
 }
 
-.wrap { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
 .canvas { background: #111519; border: 1px solid #293039; border-radius: 14px; overflow: hidden; }
 
 .dash { stroke-dasharray: 8 6; }
