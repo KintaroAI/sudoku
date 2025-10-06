@@ -173,6 +173,9 @@
                   // Re-center value in case of future resize/move
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
+                  
+                  // Update hints for all cells when a value is cleared
+                  updateAllHints();
                   return;
                 }
                 const n = Number(v);
@@ -208,6 +211,9 @@
                   // Re-center (defensive)
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
+                  
+                  // Update hints for all cells when a value is set
+                  updateAllHints();
                 }
               };
             }
@@ -330,9 +336,6 @@
             // Delete / Backspace to clear
             if (e.key === "Backspace" || e.key === "Delete") {
               blk.setValue(null);
-              // Re-render hints with new position
-              const currentHints = blk._currentHints || [];
-              blk.setHints(currentHints);
               e.preventDefault();
             }
           });
@@ -444,25 +447,92 @@
             drawSubgridGuides(b, { N, subRows, subCols, margin, cellSize, gap });
           }
 
-          // Auto-generate hints for all blocks up to maxHint
-          const allHints = Array.from({length: effectiveMaxHint}, (_, i) => i + 1); // [1, 2, ..., maxHint]
-          
-          // Apply hints to all blocks
-          for (let r = 1; r <= ROWS; r++) {
+          // Helper function to get all numbers in a row
+          function getNumbersInRow(row) {
+            const numbers = [];
             for (let c = 1; c <= COLS; c++) {
-              const blockId = `R${r}C${c}`;
+              const blockId = `R${row}C${c}`;
               const blk = b.block(blockId);
-              if (blk) {
-                blk.setHints(allHints);
+              if (blk && blk._value !== null) {
+                numbers.push(blk._value);
+              }
+            }
+            return numbers;
+          }
+
+          // Helper function to get all numbers in a column
+          function getNumbersInColumn(col) {
+            const numbers = [];
+            for (let r = 1; r <= ROWS; r++) {
+              const blockId = `R${r}C${col}`;
+              const blk = b.block(blockId);
+              if (blk && blk._value !== null) {
+                numbers.push(blk._value);
+              }
+            }
+            return numbers;
+          }
+
+          // Helper function to get all numbers in a 3x3 section
+          function getNumbersInSection(row, col) {
+            const numbers = [];
+            // Calculate which 3x3 section this cell belongs to
+            const sectionStartRow = Math.floor((row - 1) / subRows) * subRows + 1;
+            const sectionStartCol = Math.floor((col - 1) / subCols) * subCols + 1;
+            
+            for (let r = sectionStartRow; r < sectionStartRow + subRows; r++) {
+              for (let c = sectionStartCol; c < sectionStartCol + subCols; c++) {
+                const blockId = `R${r}C${c}`;
+                const blk = b.block(blockId);
+                if (blk && blk._value !== null) {
+                  numbers.push(blk._value);
+                }
+              }
+            }
+            return numbers;
+          }
+
+          // Helper function to get valid hints for a cell based on Sudoku rules
+          function getValidHints(row, col) {
+            const existingNumbers = new Set([
+              ...getNumbersInRow(row),
+              ...getNumbersInColumn(col),
+              ...getNumbersInSection(row, col)
+            ]);
+            
+            const validHints = [];
+            for (let i = 1; i <= effectiveMaxHint; i++) {
+              if (!existingNumbers.has(i)) {
+                validHints.push(i);
+              }
+            }
+            return validHints;
+          }
+
+          // Helper function to update hints for all cells
+          function updateAllHints() {
+            for (let r = 1; r <= ROWS; r++) {
+              for (let c = 1; c <= COLS; c++) {
+                const blockId = `R${r}C${c}`;
+                const blk = b.block(blockId);
+                if (blk && blk._value === null) { // Only update hints for empty cells
+                  const validHints = getValidHints(r, c);
+                  blk.setHints(validHints);
+                }
               }
             }
           }
+
+          // Initial hint generation
+          updateAllHints();
 
           // Expose a tiny control API on the diagram object for later tinkering
           b.sudoku = {
             setActive,
             setHints(id, arr) { const blk = b.block(id); if (blk) blk.setHints(arr); },
             clearHints(id) { const blk = b.block(id); if (blk) blk.setHints([]); },
+            updateAllHints,
+            getValidHints(row, col) { return getValidHints(row, col); },
             size: { rows: ROWS, cols: COLS }
           };
         }, {
@@ -509,13 +579,13 @@
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
         subRows: 2,
-        subCols: 1,
+        subCols: 3,
         singleSection: false,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
-        maxHint: 2,
+        //maxHint: 2,
         correctValues: {
           "R1C1": 1,
           "R1C2": 2,
