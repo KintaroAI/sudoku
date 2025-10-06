@@ -284,7 +284,7 @@
             }
           });
 
-          // Render hints: draw a 3x3 grid of tiny digits (1..9) colored per number.
+          // Render hints: draw a 3x3 grid of tiny digits (1..maxHint) colored per number.
           function renderHints(blk, values) {
             const set = new Set(values || []);
             const g = blk._hintsEl;
@@ -297,6 +297,13 @@
             
             g.replaceChildren();
 
+            // Calculate maximum hint number based on section size
+            const maxHint = subRows * subCols; // Number of blocks in one section
+            
+            // Filter out hints that exceed the maximum
+            const filteredValues = Array.from(set).filter(val => val >= 1 && val <= maxHint);
+            const filteredSet = new Set(filteredValues);
+
             // Cell inner box
             const pad = 10; // inner padding
             const w = blk.w - pad*2;
@@ -305,14 +312,14 @@
             const cellW = w / 3;
             const cellH = h / 3;
 
-            // Positions for digits 1..9 in row-major 3x3
-            for (let d = 1; d <= 9; d++) {
+            // Positions for digits 1..maxHint in row-major 3x3
+            for (let d = 1; d <= maxHint; d++) {
               const idx = d - 1;
               const rr = Math.floor(idx / 3);
               const cc = idx % 3;
               const cx = blk.x + pad + cc*cellW + cellW/2;
               const cy = blk.y + pad + rr*cellH + cellH/2;
-              if (set.has(d)) {
+              if (filteredSet.has(d)) {
                 const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 t.setAttribute("x", cx);
                 t.setAttribute("y", cy);
@@ -357,10 +364,9 @@
           // Demo: seed a few hints so you can see the feature
           // (You can replace these with your own later)
           const demo = [
-            { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9] },
-            { at: "R1C2", hints: [2,5,6,9] },
-            { at: "R3C2", hints: [7,8]   },
-            { at: "R4C4", hints: [1,2,3,4,5,6,7,8,9] }
+            { at: "R1C1", hints: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] }, // Should only show 1,2,3
+            { at: "R1C2", hints: [2,5,6,9] }, // Should only show 2
+            { at: "R1C3", hints: [1,2,3,7,8,9,10,11,12,13,14,15,16] } // Should only show 1,2,3
           ]; // Show hints for all grid sizes
           for (const {at, hints} of demo) {
             const blk = b.block(at);
@@ -417,9 +423,9 @@
 
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 1,
-        subCols: 3,
-        singleSection: true,   // <-- enable special case
+        subRows: 2,
+        subCols: 1,
+        singleSection: false,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
