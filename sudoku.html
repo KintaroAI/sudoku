@@ -99,6 +99,7 @@
        *   gap: spacing between cells (px)
        *   margin: outer margin inside canvas (px)
        *   singleSection: if true, render only subRows x subCols cells instead of NxN board
+       *   maxHint: maximum hint number (if null, defaults to subRows * subCols)
        */
       function initSudoku(container, {
         subRows = 2,
@@ -108,7 +109,8 @@
         margin = 15,
         hintShake = true,
         correctValues = {},
-        singleSection = false
+        singleSection = false,
+        maxHint = null
       } = {}) {
         const N = subRows * subCols; // classic board size
         const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -368,11 +370,11 @@
             
             g.replaceChildren();
 
-            // Calculate maximum hint number based on section size
-            const maxHint = subRows * subCols; // Number of blocks in one section
+            // Calculate maximum hint number based on section size or provided maxHint
+            const effectiveMaxHint = maxHint !== null ? maxHint : (subRows * subCols);
             
             // Filter out hints that exceed the maximum
-            const filteredValues = Array.from(set).filter(val => val >= 1 && val <= maxHint);
+            const filteredValues = Array.from(set).filter(val => val >= 1 && val <= effectiveMaxHint);
             const filteredSet = new Set(filteredValues);
             
             if (filteredSet.size === 0) {
@@ -383,7 +385,7 @@
             }
 
             // Calculate optimal grid dimensions based on the maximum hint number
-            const { rows, cols } = calculateGridDimensions(maxHint);
+            const { rows, cols } = calculateGridDimensions(effectiveMaxHint);
 
             // Cell inner box
             const pad = 10; // inner padding
@@ -510,13 +512,14 @@
 
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 3,
-        subCols: 3,
-        singleSection: false,   // <-- enable special case
+        subRows: 1,
+        subCols: 1,
+        singleSection: true,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
+        maxHint: 2,
         correctValues: {
           "R1C1": 1,
           "R1C2": 2,
