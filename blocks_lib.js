@@ -151,8 +151,13 @@
       const defs=create("defs",{},this.svg);
       if(this.opts.grid){ const p=create("pattern",{id:this.ids.grid,width:24,height:24,patternUnits:"userSpaceOnUse"},defs);
         create("path",{d:"M24 0H0V24",fill:"none",stroke:"var(--grid)","stroke-width":"1"},p);
-        // Size the grid rect to the viewBox so it never over/underflows when scaling
-        create("rect",{x:0,y:0,width:this.opts.width, height:this.opts.height, fill:`url(#${this.ids.grid})`},this.svg); }
+        // Create a large grid rect that covers the entire SVG area
+        const gridRect = create("rect",{x:0,y:0,width:"100%", height:"100%", fill:`url(#${this.ids.grid})`},this.svg);
+        // Ensure the grid covers the full SVG area by setting a large viewBox
+        gridRect.setAttribute("width", "2000");
+        gridRect.setAttribute("height", "2000");
+        gridRect.setAttribute("x", "-500");
+        gridRect.setAttribute("y", "-500"); }
       const marker=create("marker",{id:this.ids.arrow,viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"5",markerHeight:"5",orient:"auto-start-reverse"},defs);
       create("polygon",{points:"0,0 10,5 0,10",fill:"context-stroke"},marker);
       // Paint order (bottom → top):
