@@ -57,6 +57,12 @@
         const currentHints = this._currentHints || [];
         this.setHints(currentHints);
       }
+      
+      // Update value text position when block moves
+      if (this._valueEl) {
+        this._valueEl.setAttribute("x", this.x + this.w/2);
+        this._valueEl.setAttribute("y", this.y + this.h/2);
+      }
     }
     _bindDrag(){
       let start=null;
