@@ -104,6 +104,7 @@
        *   clickToSetAnswer: if true, clicking an empty block sets the expected answer as value instead of selecting it.
        *                     If no correct value is set, randomly selects from available hints.
        *                     If block already has a value, clicking just selects it (ignores this flag).
+       *   autoHints: if true, automatically update hints when values are set or cleared. If false, hints remain unchanged.
        */
       function initSudoku(container, {
         subRows = 2,
@@ -116,7 +117,8 @@
         singleSection = false,
         maxHint = null,
         autosolver = false,
-        clickToSetAnswer = false
+        clickToSetAnswer = false,
+        autoHints = true
       } = {}) {
         const N = subRows * subCols; // classic board size
         const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -199,8 +201,10 @@
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
                   
-                  // Update hints for all cells when a value is cleared
-                  updateAllHints();
+                  // Update hints for all cells when a value is cleared (if autoHints is enabled)
+                  if (autoHints) {
+                    updateAllHints();
+                  }
                   return;
                 }
                 const n = Number(v);
@@ -237,8 +241,10 @@
                   blk._valueEl.setAttribute("x", blk.x + blk.w/2);
                   blk._valueEl.setAttribute("y", blk.y + blk.h/2);
                   
-                  // Update hints for all cells when a value is set
-                  updateAllHints();
+                  // Update hints for all cells when a value is set (if autoHints is enabled)
+                  if (autoHints) {
+                    updateAllHints();
+                  }
                 }
               };
             }
@@ -563,6 +569,8 @@
             clearHints(id) { const blk = b.block(id); if (blk) blk.setHints([]); },
             updateAllHints,
             getValidHints(row, col) { return getValidHints(row, col); },
+            setAutoHints(enabled) { autoHints = enabled; },
+            getAutoHints() { return autoHints; },
             size: { rows: ROWS, cols: COLS }
           };
         }, {
@@ -609,17 +617,18 @@
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
         subRows: 2,
-        subCols: 2,
+        subCols: 1,
         singleSection: true,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
-        autosolver: true, // Enable autosolver - automatically set values when only one hint remains
+        autosolver: false, // Enable autosolver - automatically set values when only one hint remains
         clickToSetAnswer: true, // Set to true to make clicks set expected answers instead of selecting
+        autoHints: true, // Set to false to disable automatic hint updates when values are set/cleared
         //maxHint: 2,
         correctValues: {
-          "R1C1": 1,
+          //"R1C1": 1,
           "R1C2": 2,
           // Add more correct values as needed
         }
@@ -629,6 +638,11 @@
       // sudoku.setActive("R2C2");
       // sudoku.setHints("R2C2", [2,4]);
       // sudoku.clearHints("R4C4");
+      
+      // Example: control automatic hint updates
+      // sudoku.setAutoHints(true);  // Enable automatic hint updates
+      // sudoku.setAutoHints(false); // Disable automatic hint updates
+      // console.log(sudoku.getAutoHints()); // Check current state
       
       // Example: Test the new clickToSetAnswer flag
       // To test: change clickToSetAnswer to true above, then click on blocks
