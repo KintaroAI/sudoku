@@ -101,6 +101,7 @@
        *   singleSection: if true, render only subRows x subCols cells instead of NxN board
        *   maxHint: maximum hint number (if null, defaults to subRows * subCols)
        *   autosolver: if true, automatically set cell values when only one hint remains
+       *   clickToSetAnswer: if true, clicking a block sets the expected answer as value instead of selecting it
        */
       function initSudoku(container, {
         subRows = 2,
@@ -112,7 +113,8 @@
         correctValues = {},
         singleSection = false,
         maxHint = null,
-        autosolver = false
+        autosolver = false,
+        clickToSetAnswer = false
       } = {}) {
         const N = subRows * subCols; // classic board size
         const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -133,10 +135,16 @@
               const blk = b.addBlock(id, x, y, cellSize, cellSize, "");
               blocks.push(blk);
 
-              // Click to select (single-active behavior)
+              // Click to select (single-active behavior) or set expected answer
               blk.g.addEventListener("click", (e) => {
                 e.stopPropagation();
-                setActive(blk.id);
+                if (clickToSetAnswer && blk._correctValue !== null) {
+                  // Set the expected answer as the value
+                  blk.setValue(blk._correctValue);
+                } else {
+                  // Default behavior: select the block
+                  setActive(blk.id);
+                }
               });
 
               // Create a "hints" overlay group inside each block
@@ -585,14 +593,15 @@
 
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 2,
+        subRows: 1,
         subCols: 2,
         singleSection: true,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
-        autosolver: false, // Enable autosolver - automatically set values when only one hint remains
+        autosolver: true, // Enable autosolver - automatically set values when only one hint remains
+        clickToSetAnswer: true, // Set to true to make clicks set expected answers instead of selecting
         //maxHint: 2,
         correctValues: {
           "R1C1": 1,
@@ -605,6 +614,10 @@
       // sudoku.setActive("R2C2");
       // sudoku.setHints("R2C2", [2,4]);
       // sudoku.clearHints("R4C4");
+      
+      // Example: Test the new clickToSetAnswer flag
+      // To test: change clickToSetAnswer to true above, then click on blocks with correctValues
+      // They should set the expected answer as the value instead of selecting the block
     })();
   </script>
 </body>
