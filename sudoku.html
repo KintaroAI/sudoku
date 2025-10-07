@@ -54,15 +54,22 @@
     pointer-events: none;
   }
   /* Per-digit hint colors (tweak to taste) */
-  .sudoku-hint-1 { fill: #F44336; } /* red */
-  .sudoku-hint-2 { fill: #E91E63; } /* pink */
-  .sudoku-hint-3 { fill: #9C27B0; } /* purple */
-  .sudoku-hint-4 { fill: #3F51B5; } /* indigo */
-  .sudoku-hint-5 { fill: #2196F3; } /* blue */
-  .sudoku-hint-6 { fill: #009688; } /* teal */
-  .sudoku-hint-7 { fill: #4CAF50; } /* green */
-  .sudoku-hint-8 { fill: #FFC107; } /* amber */
-  .sudoku-hint-9 { fill: #FF9800; } /* orange */
+  .sudoku-hint-1 { fill: #FF6B6B; } /* coral */
+  .sudoku-hint-2 { fill: #45B7D1; } /* sky blue */
+  .sudoku-hint-3 { fill: #4ECDC4; } /* mint */
+  .sudoku-hint-4 { fill: #FFEAA7; } /* cream */
+  .sudoku-hint-5 { fill: #4CAF50; } /* green */
+  .sudoku-hint-6 { fill: #F44336; } /* red */
+  .sudoku-hint-7 { fill: #E91E63; } /* pink */
+  .sudoku-hint-8 { fill: #9C27B0; } /* purple */
+  .sudoku-hint-9 { fill: #3F51B5; } /* indigo */
+  .sudoku-hint-10 { fill: #FF5722; } /* deep orange */
+  .sudoku-hint-11 { fill: #795548; } /* brown */
+  .sudoku-hint-12 { fill: #607D8B; } /* blue grey */
+  .sudoku-hint-13 { fill: #00BCD4; } /* cyan */
+  .sudoku-hint-14 { fill: #8BC34A; } /* light green */
+  .sudoku-hint-15 { fill: #CDDC39; } /* lime */
+  .sudoku-hint-16 { fill: #FFEB3B; } /* yellow */
 
   /* Thicker subgrid guides (drawn as note blocks so they sit on top) */
   .subgrid-line { fill:none; stroke:#5a646e; stroke-width:3.5; opacity:.9; }
@@ -215,7 +222,7 @@
                   return;
                 }
                 const n = Number(v);
-                if (n >= 1 && n <= 9) {
+                if (n >= 1 && n <= 16) {
                   blk._value = n;
                   blk._valueEl.textContent = String(n);
                   blk._valueEl.style.display = "";
@@ -623,20 +630,20 @@
 
       // --- Kickoff: 2x1 single section (2 cells total) as requested ---
       window.sudoku = initSudoku("#sudoku", {
-        subRows: 1,
+        subRows: 2,
         subCols: 2,
-        singleSection: true,   // <-- enable special case
+        singleSection: false,   // <-- enable special case
         cellSize: 110,
         gap: 32,
         margin: 36,
         hintShake: true,  // Set to false to disable hint shaking
-        autosolver: false, // Enable autosolver - automatically set values when only one hint remains
+        autosolver: true, // Enable autosolver - automatically set values when only one hint remains
         clickToSetAnswer: true, // Set to true to make clicks set expected answers instead of selecting
-        autoHints: false, // Set to false to disable automatic hint updates when values are set/cleared
+        autoHints: true, // Set to false to disable automatic hint updates when values are set/cleared
         //maxHint: 2,
         correctValues: {
           //"R1C1": 1,
-          "R1C2": 2,
+          //"R1C2": 2,
           // Add more correct values as needed
         }
       });
