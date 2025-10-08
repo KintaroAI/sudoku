@@ -189,8 +189,17 @@
 
       // UI toggles
       let autosolverOn = true;
-      function toggleAutosolver(){ autosolverOn = !autosolverOn; autosolverState.textContent = autosolverOn ? "ON" : "OFF"; }
-      function toggleAutoHints(){ const cur = board.sudoku.getAutoHints(); board.sudoku.setAutoHints(!cur); autohintsState.textContent = !cur ? "ON" : "OFF"; board.sudoku.updateAllHints(); }
+      function toggleAutosolver(){ 
+        autosolverOn = !autosolverOn; 
+        board.sudoku.setAutosolver(autosolverOn);
+        autosolverState.textContent = autosolverOn ? "ON" : "OFF"; 
+      }
+      function toggleAutoHints(){ 
+        const cur = board.sudoku.getAutoHints(); 
+        board.sudoku.setAutoHints(!cur); 
+        autohintsState.textContent = !cur ? "ON" : "OFF"; 
+        board.sudoku.updateAllHints(); 
+      }
 
       // Wire events
       $("loadSolution").addEventListener("click", loadSolution);

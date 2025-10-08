@@ -490,6 +490,8 @@
         getValidHints(row, col) { return getValidHints(row, col); },
         setAutoHints(enabled) { autoHints = enabled; },
         getAutoHints() { return autoHints; },
+        setAutosolver(enabled) { autosolver = enabled; },
+        getAutosolver() { return autosolver; },
         size: { rows: ROWS, cols: COLS }
       };
     }, {
