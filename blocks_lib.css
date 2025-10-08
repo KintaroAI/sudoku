@@ -23,11 +23,11 @@
   cursor: grabbing; 
 }
 
-/*.block text { 
+.block-text { 
   fill: var(--text); 
   font-size: 16px; 
   font-weight: 500; 
-}*/
+}
 
 /* Optional: styling tweak for notes */
 .block.note rect { 

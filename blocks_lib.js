@@ -22,7 +22,7 @@
       const parent = opts.note ? this.d.gNotes : this.d.gBlocks;
       this.g = create("g", {class:`block${opts.note?' note':''}`,"data-id":id}, parent);
       this.rect = create("rect", {x,y,width:w,height:h,rx:14,ry:14}, this.g);
-      this.text = create("text", {"text-anchor":"middle","dominant-baseline":"middle"}, this.g);
+      this.text = create("text", {"text-anchor":"middle","dominant-baseline":"middle", class:"block-text"}, this.g);
       this._renderText(); this._bindDrag();
     }
     _renderText(){

@@ -1,0 +1,77 @@
+html, body { height:100%; margin:0; background:var(--bg); color:var(--text); font:16px/1.35 system-ui, Segoe UI, Roboto, Arial; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+.canvas { background:#111519; border:1px solid #293039; border-radius:14px; overflow:hidden; }
+#sudoku { height: 950px; }
+
+/* Active/selected cell styling */
+.block.active rect {
+  stroke: #8bd1ff;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 6px rgba(139,209,255,.45));
+}
+
+
+.block.correct rect {
+  stroke: #4CAF50;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 1px rgba(76,175,80,.6));
+}
+
+.block.incorrect rect {
+  stroke: #F44336;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 1px rgba(244,67,54,.6));
+}
+
+/* Validation feedback borders */
+.block.active.correct rect {
+  stroke: #4CAF50;
+  stroke-width: 4;
+  filter: drop-shadow(0 0 8px rgba(76,175,80,.6));
+}
+
+.block.active.incorrect rect {
+  stroke: #F44336;
+  stroke-width: 4;
+  filter: drop-shadow(0 0 8px rgba(244,67,54,.6));
+}
+
+/* Hints (3x3 pencil marks) */
+.sudoku-hints text {
+  font-size: 23px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  opacity: .95;
+  pointer-events: none;
+}
+/* Per-digit hint colors (tweak to taste) */
+.sudoku-hint-1 { fill: #FF6B6B; } /* coral */
+.sudoku-hint-2 { fill: #45B7D1; } /* sky blue */
+.sudoku-hint-3 { fill: #4ECDC4; } /* mint */
+.sudoku-hint-4 { fill: #FFEAA7; } /* cream */
+.sudoku-hint-5 { fill: #4CAF50; } /* green */
+.sudoku-hint-6 { fill: #F44336; } /* red */
+.sudoku-hint-7 { fill: #E91E63; } /* pink */
+.sudoku-hint-8 { fill: #9C27B0; } /* purple */
+.sudoku-hint-9 { fill: #3F51B5; } /* indigo */
+.sudoku-hint-10 { fill: #FF5722; } /* deep orange */
+.sudoku-hint-11 { fill: #795548; } /* brown */
+.sudoku-hint-12 { fill: #607D8B; } /* blue grey */
+.sudoku-hint-13 { fill: #00BCD4; } /* cyan */
+.sudoku-hint-14 { fill: #8BC34A; } /* light green */
+.sudoku-hint-15 { fill: #CDDC39; } /* lime */
+.sudoku-hint-16 { fill: #FFEB3B; } /* yellow */
+
+/* Thicker subgrid guides (drawn as note blocks so they sit on top) */
+.subgrid-line { fill:none; stroke:#5a646e; stroke-width:3.5; opacity:.9; }
+
+/* Big number in a cell */
+.sudoku-value {
+  font-size: 44px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  opacity: .98;
+  pointer-events: none;
+}
