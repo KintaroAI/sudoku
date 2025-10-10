@@ -1,7 +1,5 @@
-html, body { height:100%; margin:0; background:var(--bg); color:var(--text); font:16px/1.35 system-ui, Segoe UI, Roboto, Arial; }
 .wrap { max-width: 1400px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
 .canvas { background:#111519; border:1px solid #293039; border-radius:14px; overflow:hidden; }
-#sudoku { height: 950px; }
 
 /* Active/selected cell styling */
 .block.active rect {
