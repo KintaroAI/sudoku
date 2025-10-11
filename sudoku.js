@@ -132,6 +132,11 @@
               blk._valueEl.textContent = String(n);
               blk._valueEl.style.display = "";
               
+              // Calculate font size based on block size (scale with block size)
+              const baseFontSize = Math.min(blk.w, blk.h) * 0.6; // Scale font to 60% of smallest block dimension
+              const fontSize = Math.max(16, Math.min(64, baseFontSize)); // Clamp between 16px and 64px
+              blk._valueEl.setAttribute("font-size", fontSize);
+
               // Add hint color class based on number
               blk._valueEl.setAttribute("class", `sudoku-value sudoku-hint-${n}`);
               
@@ -348,6 +353,10 @@
         const cellW = w / cols;
         const cellH = h / rows;
 
+        // Calculate font size based on cell size (scale with block size)
+        const baseFontSize = Math.min(cellW, cellH) * 0.4; // Scale font to 40% of smallest cell dimension
+        const fontSize = Math.max(8, Math.min(24, baseFontSize)); // Clamp between 8px and 24px
+
         // Position hints based on their actual numbers (1-based indexing)
         for (const hintNum of filteredSet) {
           // Convert 1-based hint number to 0-based grid position
@@ -361,6 +370,7 @@
           t.setAttribute("x", cx);
           t.setAttribute("y", cy);
           t.setAttribute("class", `sudoku-hint-${hintNum}`);
+          t.setAttribute("font-size", fontSize);
           t.textContent = hintNum.toString();
           
           // Add random shake animation (if enabled)
