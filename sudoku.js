@@ -354,8 +354,8 @@
         const cellH = h / rows;
 
         // Calculate font size based on cell size (scale with block size)
-        const baseFontSize = Math.min(cellW, cellH) * 0.4; // Scale font to 40% of smallest cell dimension
-        const fontSize = Math.max(8, Math.min(24, baseFontSize)); // Clamp between 8px and 24px
+        const baseFontSize = Math.min(cellW, cellH) * 0.6; // Scale font to 60% of smallest cell dimension
+        const fontSize = Math.max(12, Math.min(32, baseFontSize)); // Clamp between 12px and 32px
 
         // Position hints based on their actual numbers (1-based indexing)
         for (const hintNum of filteredSet) {
