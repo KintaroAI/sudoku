@@ -17,6 +17,7 @@
    *                     If no correct value is set, randomly selects from available hints.
    *                     If block already has a value, clicking just selects it (ignores this flag).
    *   autoHints: if true, automatically update hints when values are set or cleared. If false, hints remain unchanged.
+   *   preferCustomHints: if true, when clicking a block, prefer custom hints over auto-calculated hints even when autoHints is enabled.
    */
   function initSudoku(container, {
     subRows = 2,
@@ -30,7 +31,8 @@
     maxHint = null,
     autosolver = false,
     clickToSetAnswer = false,
-    autoHints = true
+    autoHints = true,
+    preferCustomHints = false
   } = {}) {
     const N = subRows * subCols; // classic board size
     const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -62,7 +64,10 @@
               } else {
                 // No correct value set - randomly select from available hints
                 let availableHints;
-                if (autoHints) {
+                if (preferCustomHints && blk._currentHints && blk._currentHints.length > 0) {
+                  // When preferCustomHints is enabled and custom hints exist, use them
+                  availableHints = blk._currentHints;
+                } else if (autoHints) {
                   // When autoHints is enabled, use calculated valid hints based on sudoku rules
                   availableHints = getValidHints(
                     parseInt(blk.id.match(/R(\d+)/)[1], 10),
