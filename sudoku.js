@@ -18,6 +18,7 @@
    *                     If block already has a value, clicking just selects it (ignores this flag).
    *   autoHints: if true, automatically update hints when values are set or cleared. If false, hints remain unchanged.
    *   preferCustomHints: if true, when clicking a block, prefer custom hints over auto-calculated hints even when autoHints is enabled.
+   *   disableClickHandling: if true, clicking on cells will be ignored and not collapse state. Useful for measurement-only scenarios.
    */
   function initSudoku(container, {
     subRows = 2,
@@ -32,7 +33,8 @@
     autosolver = false,
     clickToSetAnswer = false,
     autoHints = true,
-    preferCustomHints = false
+    preferCustomHints = false,
+    disableClickHandling = false
   } = {}) {
     const N = subRows * subCols; // classic board size
     const ROWS = singleSection ? subRows : N;    // <-- NEW
@@ -56,6 +58,12 @@
           // Click to select (single-active behavior) or set expected answer
           blk.g.addEventListener("click", (e) => {
             e.stopPropagation();
+            
+            // If click handling is disabled, ignore all clicks
+            if (disableClickHandling) {
+              return;
+            }
+            
             if (clickToSetAnswer && blk._value === null) {
               // Only set values if the block is empty
               if (blk._correctValue !== null) {
